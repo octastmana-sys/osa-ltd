@@ -15,22 +15,27 @@ const money = new Intl.NumberFormat("th-TH", {
 });
 const number = new Intl.NumberFormat("th-TH");
 
-const COLLECTIONS = [
+const CORE_COLLECTIONS = [
   "customers",
   "projects",
   "quotations",
-  "quotation_items",
   "documents",
-  "document_numbers",
   "invoices",
   "receipts",
   "project_costs",
   "office_expenses",
+];
+
+const AUX_COLLECTIONS = [
+  "quotation_items",
+  "document_numbers",
   "workflow_events",
   "reference_options",
   "document_settings",
   "company_profile",
 ];
+
+const COLLECTIONS = [...CORE_COLLECTIONS, ...AUX_COLLECTIONS];
 
 let firebaseApi = {};
 let firestoreDb = null;
@@ -39,6 +44,7 @@ let currentUser = null;
 let currentRole = null;
 let octaCurrentView = "home";
 let octaSearch = "";
+let auxCollectionsLoaded = false;
 
 const $ = (id) => document.getElementById(id);
 const liveRoot = $("live-console");
@@ -163,11 +169,31 @@ async function fetchCollection(name) {
   return snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
 }
 
-async function loadAllCollections() {
+async function loadCollections(names) {
   const entries = await Promise.all(
-    COLLECTIONS.map(async (name) => [name, await fetchCollection(name)]),
+    names.map(async (name) => [name, await fetchCollection(name)]),
   );
-  liveState = Object.fromEntries(entries);
+  liveState = { ...liveState, ...Object.fromEntries(entries) };
+  return liveState;
+}
+
+async function loadCoreCollections() {
+  auxCollectionsLoaded = false;
+  liveState = Object.fromEntries(COLLECTIONS.map((name) => [name, []]));
+  return loadCollections(CORE_COLLECTIONS);
+}
+
+async function loadAuxCollections() {
+  await loadCollections(AUX_COLLECTIONS);
+  auxCollectionsLoaded = true;
+  return liveState;
+}
+
+async function loadAllCollections() {
+  auxCollectionsLoaded = false;
+  liveState = Object.fromEntries(COLLECTIONS.map((name) => [name, []]));
+  await loadCollections(COLLECTIONS);
+  auxCollectionsLoaded = true;
   return liveState;
 }
 
@@ -714,6 +740,11 @@ function renderWorkbenchList() {
   const rows = liveState[collectionName] || [];
   const list = $("workbench-records");
   if (!list) return;
+  if (AUX_COLLECTIONS.includes(collectionName) && !auxCollectionsLoaded) {
+    list.innerHTML = '<p class="empty-state">Loading extended collections…</p>';
+    setText("workbench-count", "Loading…");
+    return;
+  }
   list.innerHTML = rows
     .sort((a, b) => labelForRecord(collectionName, a).localeCompare(labelForRecord(collectionName, b)))
     .map(
@@ -935,13 +966,23 @@ async function createQuickCustomer(event) {
 }
 
 async function refreshLiveData(showStatus = true) {
-  if (showStatus) setLiveStatus("Loading Firestore records…");
-  await loadAllCollections();
+  if (showStatus) setLiveStatus("Loading core Firestore records…");
+  await loadCoreCollections();
   renderDashboard();
   setupWorkbench();
   setupOctaShell();
   renderWorkbenchList();
-  if (showStatus) setLiveStatus("Connected to Firestore. Data below is live.", "success");
+  if (showStatus) setLiveStatus("Connected. Core app is ready; extended settings are loading in the background.", "success");
+  setTimeout(async () => {
+    try {
+      await loadAuxCollections();
+      renderDashboard();
+      renderWorkbenchList();
+      if (showStatus) setLiveStatus("Connected to Firestore. All collections are loaded.", "success");
+    } catch (error) {
+      if (showStatus) setLiveStatus(error?.message || "Core app loaded, but extended collections failed.", "error");
+    }
+  }, 0);
 }
 
 async function init() {
