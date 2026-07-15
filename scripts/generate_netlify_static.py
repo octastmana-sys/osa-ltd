@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import html
 import json
+import os
 from pathlib import Path
 
 
@@ -170,6 +171,51 @@ def main() -> None:
     </div>
   </section>
 
+  <section class="section live-console" id="live-console">
+    <div class="section__heading">
+      <p class="eyebrow">Live Firestore</p>
+      <h2>Sign in to read the migrated production database.</h2>
+      <p>This console uses Firebase Authentication and your Firestore role document. It reads live migrated records and does not write data yet.</p>
+    </div>
+    <div class="live-shell">
+      <form class="live-login" id="live-login-form">
+        <label>Email<input id="live-email" type="email" autocomplete="email" value="octa.stm.ana@gmail.com" /></label>
+        <label>Password<input id="live-password" type="password" autocomplete="current-password" /></label>
+        <button type="submit">Sign in</button>
+      </form>
+      <div class="live-status" id="live-status">Sign in with your Firebase account to view live Firestore data.</div>
+      <div class="live-data hidden" id="live-data">
+        <div class="live-toolbar">
+          <div><strong id="live-user-email">Signed in</strong><span>Role: <b id="live-user-role">staff</b></span></div>
+          <button id="live-sign-out" type="button">Sign out</button>
+        </div>
+        <div class="stats__grid live-stats">
+          <div class="stat-card"><span>Customers</span><strong id="live-count-customers">0</strong></div>
+          <div class="stat-card"><span>Projects</span><strong id="live-count-projects">0</strong></div>
+          <div class="stat-card"><span>Quotations</span><strong id="live-count-quotations">0</strong></div>
+          <div class="stat-card"><span>Documents</span><strong id="live-count-documents">0</strong></div>
+          <div class="stat-card"><span>Invoices</span><strong id="live-count-invoices">0</strong></div>
+          <div class="stat-card"><span>Receipts</span><strong id="live-count-receipts">0</strong></div>
+        </div>
+        <div class="money-grid live-money">
+          <div class="money-card"><span>Quotation total</span><strong id="live-quotation-total">฿0</strong></div>
+          <div class="money-card"><span>Invoice total</span><strong id="live-invoice-total">฿0</strong></div>
+          <div class="money-card"><span>Paid total</span><strong id="live-paid-total">฿0</strong></div>
+          <div class="money-card alert"><span>Costs + expenses</span><strong id="live-cost-total">฿0</strong></div>
+        </div>
+        <div class="split live-split">
+          <div class="panel"><p class="eyebrow">Project status</p><div class="chip-list" id="live-project-status"></div></div>
+          <div class="panel"><p class="eyebrow">Quotation status</p><div class="chip-list" id="live-quotation-status"></div></div>
+        </div>
+        <div class="live-tables">
+          <div class="panel"><h3>Latest projects</h3><div id="live-projects-table"></div></div>
+          <div class="panel"><h3>Latest quotations</h3><div id="live-quotations-table"></div></div>
+          <div class="panel"><h3>Latest invoices</h3><div id="live-invoices-table"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="section split">
     <div class="panel">
       <p class="eyebrow">Financial picture</p>
@@ -231,6 +277,17 @@ def main() -> None:
     <p>Built as a separate deployable project. Legacy app files and data/octa.db are not modified by this portal.</p>
   </footer>
 </main>
+<script>
+window.OSA_FIREBASE_CONFIG = {json.dumps({
+    "apiKey": os.environ.get("NEXT_PUBLIC_FIREBASE_API_KEY", "AIzaSyCQU5oGQ2d5vugzLoMwxwyFHBtD3EAc5v0"),
+    "authDomain": os.environ.get("NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN", "osa-document-os-prod-1a127.firebaseapp.com"),
+    "projectId": os.environ.get("NEXT_PUBLIC_FIREBASE_PROJECT_ID", "osa-document-os-prod-1a127"),
+    "storageBucket": os.environ.get("NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET", "osa-document-os-prod-1a127.firebasestorage.app"),
+    "messagingSenderId": os.environ.get("NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID", "524435498120"),
+    "appId": os.environ.get("NEXT_PUBLIC_FIREBASE_APP_ID", "1:524435498120:web:c91ed5a264e1d5d1b76b3d"),
+}, ensure_ascii=False)};
+</script>
+<script type="module" src="/live-firestore.js"></script>
 </body>
 </html>"""
 

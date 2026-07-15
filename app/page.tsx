@@ -145,6 +145,71 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="section live-console" id="live-console">
+        <div className="section__heading">
+          <p className="eyebrow">Live Firestore</p>
+          <h2>Sign in to read the migrated production database.</h2>
+          <p>
+            This console uses Firebase Authentication and your Firestore role
+            document. It reads live migrated records and does not write data yet.
+          </p>
+        </div>
+        <div className="live-shell">
+          <form className="live-login" id="live-login-form">
+            <label>
+              Email
+              <input id="live-email" type="email" autoComplete="email" defaultValue="octa.stm.ana@gmail.com" />
+            </label>
+            <label>
+              Password
+              <input id="live-password" type="password" autoComplete="current-password" />
+            </label>
+            <button type="submit">Sign in</button>
+          </form>
+          <div className="live-status" id="live-status">
+            Sign in with your Firebase account to view live Firestore data.
+          </div>
+          <div className="live-data hidden" id="live-data">
+            <div className="live-toolbar">
+              <div>
+                <strong id="live-user-email">Signed in</strong>
+                <span>Role: <b id="live-user-role">staff</b></span>
+              </div>
+              <button id="live-sign-out" type="button">Sign out</button>
+            </div>
+            <div className="stats__grid live-stats">
+              <div className="stat-card"><span>Customers</span><strong id="live-count-customers">0</strong></div>
+              <div className="stat-card"><span>Projects</span><strong id="live-count-projects">0</strong></div>
+              <div className="stat-card"><span>Quotations</span><strong id="live-count-quotations">0</strong></div>
+              <div className="stat-card"><span>Documents</span><strong id="live-count-documents">0</strong></div>
+              <div className="stat-card"><span>Invoices</span><strong id="live-count-invoices">0</strong></div>
+              <div className="stat-card"><span>Receipts</span><strong id="live-count-receipts">0</strong></div>
+            </div>
+            <div className="money-grid live-money">
+              <div className="money-card"><span>Quotation total</span><strong id="live-quotation-total">฿0</strong></div>
+              <div className="money-card"><span>Invoice total</span><strong id="live-invoice-total">฿0</strong></div>
+              <div className="money-card"><span>Paid total</span><strong id="live-paid-total">฿0</strong></div>
+              <div className="money-card alert"><span>Costs + expenses</span><strong id="live-cost-total">฿0</strong></div>
+            </div>
+            <div className="split live-split">
+              <div className="panel">
+                <p className="eyebrow">Project status</p>
+                <div className="chip-list" id="live-project-status" />
+              </div>
+              <div className="panel">
+                <p className="eyebrow">Quotation status</p>
+                <div className="chip-list" id="live-quotation-status" />
+              </div>
+            </div>
+            <div className="live-tables">
+              <div className="panel"><h3>Latest projects</h3><div id="live-projects-table" /></div>
+              <div className="panel"><h3>Latest quotations</h3><div id="live-quotations-table" /></div>
+              <div className="panel"><h3>Latest invoices</h3><div id="live-invoices-table" /></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="section split">
         <div className="panel">
           <p className="eyebrow">Financial picture</p>
@@ -252,6 +317,19 @@ export default function Home() {
           `data/octa.db` are not modified by this portal.
         </p>
       </footer>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `window.OSA_FIREBASE_CONFIG=${JSON.stringify({
+            apiKey: "AIzaSyCQU5oGQ2d5vugzLoMwxwyFHBtD3EAc5v0",
+            authDomain: "osa-document-os-prod-1a127.firebaseapp.com",
+            projectId: "osa-document-os-prod-1a127",
+            storageBucket: "osa-document-os-prod-1a127.firebasestorage.app",
+            messagingSenderId: "524435498120",
+            appId: "1:524435498120:web:c91ed5a264e1d5d1b76b3d",
+          })};`,
+        }}
+      />
+      <script type="module" src="/live-firestore.js" />
     </main>
   );
 }
