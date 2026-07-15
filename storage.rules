@@ -1,0 +1,35 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function userRole() {
+      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function staff() {
+      return signedIn() && (userRole() in ["admin", "sales", "accounting"]);
+    }
+
+    match /documents/{allPaths=**} {
+      allow read: if staff();
+      allow write: if staff()
+        && request.resource.size < 20 * 1024 * 1024
+        && request.resource.contentType.matches("application/pdf|text/html|image/.*");
+    }
+
+    match /company/{allPaths=**} {
+      allow read: if staff();
+      allow write: if signedIn() && userRole() == "admin"
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches("image/.*");
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

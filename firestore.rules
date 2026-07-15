@@ -1,0 +1,112 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function hasRole(role) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
+    }
+
+    function staff() {
+      return hasRole("admin") || hasRole("sales") || hasRole("accounting");
+    }
+
+    function accountingOrAdmin() {
+      return hasRole("admin") || hasRole("accounting");
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || hasRole("admin"));
+      allow create, update, delete: if hasRole("admin");
+    }
+
+    match /company_profile/{docId} {
+      allow read: if staff();
+      allow write: if hasRole("admin");
+    }
+
+    match /document_settings/{docId} {
+      allow read: if staff();
+      allow write: if hasRole("admin");
+    }
+
+    match /reference_options/{docId} {
+      allow read: if staff();
+      allow write: if hasRole("admin");
+    }
+
+    match /customers/{docId} {
+      allow read: if staff();
+      allow create, update: if hasRole("admin") || hasRole("sales");
+      allow delete: if hasRole("admin");
+    }
+
+    match /projects/{docId} {
+      allow read: if staff();
+      allow create, update: if hasRole("admin") || hasRole("sales");
+      allow delete: if hasRole("admin");
+    }
+
+    match /quotations/{docId} {
+      allow read: if staff();
+      allow create, update: if hasRole("admin") || hasRole("sales");
+      allow delete: if hasRole("admin");
+    }
+
+    match /quotation_items/{docId} {
+      allow read: if staff();
+      allow create, update: if hasRole("admin") || hasRole("sales");
+      allow delete: if hasRole("admin");
+    }
+
+    match /documents/{docId} {
+      allow read: if staff();
+      allow create, update: if staff();
+      allow delete: if hasRole("admin");
+    }
+
+    match /invoices/{docId} {
+      allow read: if staff();
+      allow create, update: if accountingOrAdmin();
+      allow delete: if hasRole("admin");
+    }
+
+    match /receipts/{docId} {
+      allow read: if staff();
+      allow create, update: if accountingOrAdmin();
+      allow delete: if hasRole("admin");
+    }
+
+    match /project_costs/{docId} {
+      allow read: if staff();
+      allow create, update: if accountingOrAdmin();
+      allow delete: if hasRole("admin");
+    }
+
+    match /office_expenses/{docId} {
+      allow read: if accountingOrAdmin();
+      allow create, update: if accountingOrAdmin();
+      allow delete: if hasRole("admin");
+    }
+
+    match /workflow_events/{docId} {
+      allow read: if staff();
+      allow create: if staff();
+      allow update, delete: if hasRole("admin");
+    }
+
+    match /migration_runs/{docId} {
+      allow read: if hasRole("admin");
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
