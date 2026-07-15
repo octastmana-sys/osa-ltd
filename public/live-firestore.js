@@ -82,6 +82,20 @@ function setEditorVisible(isVisible) {
   modal.setAttribute("aria-hidden", isVisible ? "false" : "true");
 }
 
+function setDocumentCreateVisible(isVisible) {
+  const modal = $("document-create-modal");
+  if (!modal) return;
+  modal.classList.toggle("hidden", !isVisible);
+  modal.setAttribute("aria-hidden", isVisible ? "false" : "true");
+}
+
+function setDocumentCreateStatus(message, tone = "info") {
+  const el = $("document-create-status-message");
+  if (!el) return;
+  el.textContent = message;
+  el.dataset.tone = tone;
+}
+
 function formatMoney(value) {
   return money.format(Number(value || 0));
 }
@@ -491,6 +505,15 @@ function customerForProject(projectId) {
   return lookupCustomer(project?.customer_id)?.name || project?.customer_name || "";
 }
 
+function projectOptionLabel(project) {
+  const customer = lookupCustomer(project.customer_id)?.name || project.customer_name || "";
+  return [project.project_code, project.project_name, customer].filter(Boolean).join(" | ");
+}
+
+function invoiceOptionLabel(invoice) {
+  return [invoice.invoice_no, projectLabel(invoice.project_id), formatMoney(invoice.total)].filter(Boolean).join(" | ");
+}
+
 function enhancedSearchText(row, config) {
   const raw = config.fields.map((field) => row[field]);
   if (row.project_id) {
@@ -830,6 +853,84 @@ function openWorkbenchForRecord(collectionName, docId) {
   $("workbench-json")?.focus();
 }
 
+function generateDocumentNo(documentType, documentDate) {
+  const prefixMap = {
+    DeliveryNote: "S",
+    SalesTaxInvoice: "TV",
+    TaxInvoiceReceipt: "TR",
+    Receipt: "RC",
+    PurchaseOrder: "PO",
+  };
+  const prefix = prefixMap[documentType] || "DOC";
+  const compactDate = String(documentDate || new Date().toISOString().slice(0, 10)).replaceAll("-", "");
+  const running = String((liveState.documents || []).length + 1).padStart(3, "0");
+  return `${prefix}-${compactDate}-${running}`;
+}
+
+function populateDocumentCreateForm() {
+  const projectSelect = $("document-create-project");
+  const invoiceSelect = $("document-create-invoice");
+  const dateInput = $("document-create-date");
+  if (dateInput && !dateInput.value) dateInput.value = new Date().toISOString().slice(0, 10);
+  if (projectSelect) {
+    const projects = sortedRows(liveState.projects || [], VIEW_CONFIG.projects);
+    projectSelect.innerHTML = `<option value="">-- เลือก Project --</option>${projects
+      .map((project) => `<option value="${escapeHtml(project.id)}">${escapeHtml(projectOptionLabel(project) || project.id)}</option>`)
+      .join("")}`;
+  }
+  if (invoiceSelect) {
+    const invoices = sortedRows(liveState.invoices || [], VIEW_CONFIG.invoices);
+    invoiceSelect.innerHTML = `<option value="">-- ไม่ระบุ Invoice --</option>${invoices
+      .map((invoice) => `<option value="${escapeHtml(invoice.id)}" data-project-id="${escapeHtml(invoice.project_id || "")}">${escapeHtml(invoiceOptionLabel(invoice) || invoice.id)}</option>`)
+      .join("")}`;
+  }
+}
+
+function openDocumentCreateModal() {
+  populateDocumentCreateForm();
+  $("document-create-no").value = "";
+  $("document-create-note").value = "";
+  $("document-create-status").value = "draft";
+  setDocumentCreateStatus("Ready.");
+  setDocumentCreateVisible(true);
+}
+
+async function createDocumentRecord(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const data = Object.fromEntries(new FormData(form).entries());
+  const documentDate = data.document_date || new Date().toISOString().slice(0, 10);
+  const documentType = data.document_type || "DeliveryNote";
+  if (!data.project_id) {
+    setDocumentCreateStatus("กรุณาเลือก Project ก่อนสร้างเอกสาร", "error");
+    return;
+  }
+  const invoice = lookupInvoice(data.invoice_id);
+  const payload = cleanForFirestore({
+    project_id: data.project_id,
+    invoice_id: data.invoice_id || "",
+    document_type: documentType,
+    document_no: data.document_no?.trim() || generateDocumentNo(documentType, documentDate),
+    status: data.status || "draft",
+    note: data.note?.trim() || "",
+    created_at: `${documentDate}T00:00:00.000Z`,
+    updated_at: new Date().toISOString(),
+    source: "web_app",
+  });
+  if (invoice?.project_id && !payload.project_id) payload.project_id = invoice.project_id;
+  setDocumentCreateStatus("Creating document…");
+  try {
+    const ref = await firebaseApi.addDoc(firebaseApi.collection(firestoreDb, "documents"), payload);
+    setDocumentCreateStatus(`Created ${payload.document_no}`, "success");
+    setDocumentCreateVisible(false);
+    octaCurrentView = "documents";
+    await refreshLiveData(false);
+    openWorkbenchForRecord("documents", ref.id);
+  } catch (error) {
+    setDocumentCreateStatus(error?.message || "Create document failed.", "error");
+  }
+}
+
 async function deleteRecordFromOcta(collectionName, docId) {
   const label = `${collectionName}/${docId}`;
   if (!confirm(`Delete ${label}? This cannot be undone.`)) return;
@@ -858,8 +959,16 @@ function setupOctaShell() {
       setEditorVisible(false);
       return;
     }
+    if (event.target.closest("#document-create-close") || event.target.closest("#document-create-cancel")) {
+      setDocumentCreateVisible(false);
+      return;
+    }
     if (event.target.id === "editor-modal") {
       setEditorVisible(false);
+      return;
+    }
+    if (event.target.id === "document-create-modal") {
+      setDocumentCreateVisible(false);
       return;
     }
     const homeButton = event.target.closest("[data-view-action='home']");
@@ -900,8 +1009,19 @@ function setupOctaShell() {
       octaSearch = "";
       renderOctaApp();
     }
+    if (octaCurrentView === "documents") {
+      openDocumentCreateModal();
+      return;
+    }
     const config = VIEW_CONFIG[octaCurrentView] || VIEW_CONFIG.projects;
     openWorkbenchForNew(config.collection, config.newTemplate);
+  });
+  $("document-create-form")?.addEventListener("submit", createDocumentRecord);
+  $("document-create-invoice")?.addEventListener("change", (event) => {
+    const invoice = lookupInvoice(event.target.value);
+    if (invoice?.project_id && $("document-create-project")) {
+      $("document-create-project").value = invoice.project_id;
+    }
   });
 }
 

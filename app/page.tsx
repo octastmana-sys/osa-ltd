@@ -102,6 +102,64 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        <div className="editor-modal hidden" id="document-create-modal" aria-hidden="true">
+          <form className="editor-card document-create-card" id="document-create-form">
+            <div className="editor-head">
+              <div>
+                <p className="eyebrow">Create Document</p>
+                <h2>สร้างเอกสารใหม่</h2>
+              </div>
+              <button className="btn ghost" type="button" id="document-create-close">Close</button>
+            </div>
+            <div className="form-grid document-form-grid">
+              <label>
+                ประเภทเอกสาร
+                <select name="document_type" id="document-create-type">
+                  <option value="DeliveryNote">Delivery Note</option>
+                  <option value="SalesTaxInvoice">Tax Invoice</option>
+                  <option value="TaxInvoiceReceipt">Tax Invoice Receipt</option>
+                  <option value="Receipt">Receipt</option>
+                  <option value="PurchaseOrder">Purchase Order</option>
+                </select>
+              </label>
+              <label>
+                วันที่เอกสาร
+                <input name="document_date" id="document-create-date" type="date" />
+              </label>
+              <label className="full">
+                Project
+                <select name="project_id" id="document-create-project"></select>
+              </label>
+              <label className="full">
+                Invoice / เอกสารอ้างอิง
+                <select name="invoice_id" id="document-create-invoice"></select>
+              </label>
+              <label>
+                เลขเอกสาร
+                <input name="document_no" id="document-create-no" placeholder="เว้นว่างเพื่อสร้างเลขชั่วคราวอัตโนมัติ" />
+              </label>
+              <label>
+                Status
+                <select name="status" id="document-create-status">
+                  <option value="draft">draft</option>
+                  <option value="issued">issued</option>
+                  <option value="sent">sent</option>
+                  <option value="cancelled">cancelled</option>
+                </select>
+              </label>
+              <label className="full">
+                Note
+                <textarea name="note" id="document-create-note" placeholder="หมายเหตุ"></textarea>
+              </label>
+            </div>
+            <div className="workbench-actions">
+              <button type="submit">Create document</button>
+              <button className="ghost" type="button" id="document-create-cancel">Cancel</button>
+            </div>
+            <div className="live-status compact" id="document-create-status-message">Ready.</div>
+          </form>
+        </div>
       </section>
 
       <script
