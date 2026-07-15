@@ -69,8 +69,17 @@ function setWorkbenchStatus(message, tone = "info") {
 }
 
 function setLiveVisible(isSignedIn) {
+  $("login-screen")?.classList.toggle("hidden", isSignedIn);
   $("live-login-form")?.classList.toggle("hidden", isSignedIn);
   $("live-data")?.classList.toggle("hidden", !isSignedIn);
+  document.body.classList.toggle("signed-in", isSignedIn);
+}
+
+function setEditorVisible(isVisible) {
+  const modal = $("editor-modal");
+  if (!modal) return;
+  modal.classList.toggle("hidden", !isVisible);
+  modal.setAttribute("aria-hidden", isVisible ? "false" : "true");
 }
 
 function formatMoney(value) {
@@ -767,6 +776,11 @@ function selectWorkbenchRecord(id) {
 }
 
 function setupWorkbench() {
+  if (setupWorkbench.ready) {
+    renderWorkbenchList();
+    return;
+  }
+  setupWorkbench.ready = true;
   populateWorkbenchCollections();
   const collectionSelect = $("workbench-collection");
   collectionSelect?.addEventListener("change", () => {
@@ -789,6 +803,7 @@ function setupWorkbench() {
 }
 
 function openWorkbenchForNew(collectionName, template = {}) {
+  setEditorVisible(true);
   const select = $("workbench-collection");
   if (select) select.value = collectionName;
   $("workbench-doc-id").value = "";
@@ -803,15 +818,16 @@ function openWorkbenchForNew(collectionName, template = {}) {
   );
   renderWorkbenchList();
   setWorkbenchStatus(`New ${collectionName} draft. Save when ready.`);
-  $("workbench-json")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  $("workbench-json")?.focus();
 }
 
 function openWorkbenchForRecord(collectionName, docId) {
+  setEditorVisible(true);
   const select = $("workbench-collection");
   if (select) select.value = collectionName;
   renderWorkbenchList();
   selectWorkbenchRecord(docId);
-  $("workbench-json")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  $("workbench-json")?.focus();
 }
 
 async function deleteRecordFromOcta(collectionName, docId) {
@@ -838,6 +854,14 @@ function setupOctaShell() {
     renderOctaApp();
   });
   document.addEventListener("click", async (event) => {
+    if (event.target.closest("#editor-close")) {
+      setEditorVisible(false);
+      return;
+    }
+    if (event.target.id === "editor-modal") {
+      setEditorVisible(false);
+      return;
+    }
     const homeButton = event.target.closest("[data-view-action='home']");
     if (homeButton) {
       octaCurrentView = "home";
