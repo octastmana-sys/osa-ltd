@@ -848,3 +848,242 @@ footer p {
     flex-direction: column;
   }
 }
+
+/* Octa Local Web App parity shell */
+.octa-local-shell {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  min-height: 760px;
+  overflow: hidden;
+  margin-bottom: 34px;
+  border: 1px solid #d9e2e1;
+  border-radius: 12px;
+  background: #eef3f5;
+  color: #17212b;
+  box-shadow: 0 24px 70px rgba(17, 23, 22, 0.08);
+}
+
+.octa-side {
+  background: #111;
+  color: #fff;
+  padding: 20px 16px;
+}
+
+.octa-brand {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.octa-logo {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #f2cf00;
+  color: #111;
+  font-weight: 900;
+}
+
+.octa-brand b {
+  display: block;
+  color: #f2cf00;
+  letter-spacing: 0.08em;
+}
+
+.octa-brand span {
+  color: #dbe4e8;
+  font-size: 13px;
+}
+
+.octa-nav {
+  display: grid;
+  gap: 3px;
+}
+
+.octa-nav button {
+  width: 100%;
+  border: 0;
+  border-radius: 6px;
+  padding: 9px 10px;
+  background: transparent;
+  color: #dbe4e8;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.octa-nav button:hover,
+.octa-nav button.active {
+  background: #1f2933;
+  color: #fff;
+}
+
+.octa-main {
+  min-width: 0;
+  padding: 22px 28px;
+}
+
+.octa-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.octa-top h2 {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: -0.035em;
+}
+
+.octa-top p {
+  margin: 5px 0 0;
+  color: #60707d;
+}
+
+.octa-actions,
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.btn,
+.octa-local-shell .btn,
+.octa-search button {
+  display: inline-block;
+  border: 0;
+  border-radius: 6px;
+  padding: 9px 13px;
+  background: #1f4e5f;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn.home {
+  border: 1px solid #111;
+  background: #f2cf00;
+  color: #111;
+}
+
+.btn.ghost {
+  background: #e7eef1;
+  color: #1f4e5f;
+}
+
+.btn.danger,
+button.danger {
+  background: #9f1d1d;
+  color: #fff;
+}
+
+.btn.mini {
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+.octa-dashboard-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-bottom: 18px;
+}
+
+.octa-local-shell .card {
+  border: 1px solid #d9e2e1;
+  border-radius: 8px;
+  padding: 14px;
+  background: #fff;
+}
+
+.octa-local-shell .metric {
+  color: #1f4e5f;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.octa-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  margin-bottom: 18px;
+  border: 1px solid #d9e2e1;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.octa-table th {
+  background: #1f4e5f;
+  color: #fff;
+  font-size: 13px;
+  text-align: left;
+}
+
+.octa-table th,
+.octa-table td {
+  padding: 9px;
+  border-bottom: 1px solid #e8eef0;
+  vertical-align: top;
+}
+
+.octa-table tr:nth-child(even) td {
+  background: #fbfcfc;
+}
+
+.octa-search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 8px;
+  margin: 0 0 14px;
+  border: 1px solid #d9e2e1;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fff;
+}
+
+.octa-search input {
+  width: 100%;
+  border: 1px solid #cfdadd;
+  border-radius: 6px;
+  padding: 9px;
+  font: inherit;
+}
+
+@media (max-width: 980px) {
+  .octa-local-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .octa-side {
+    padding: 16px;
+  }
+
+  .octa-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .octa-dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .octa-main {
+    padding: 16px;
+  }
+
+  .octa-top,
+  .octa-search {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .octa-nav,
+  .octa-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}

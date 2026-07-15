@@ -169,16 +169,50 @@ export default function Home() {
           <div className="live-status" id="live-status">
             Sign in with your Firebase account to view live Firestore data.
           </div>
-          <div className="live-data hidden" id="live-data">
-            <div className="live-toolbar">
-              <div>
-                <strong id="live-user-email">Signed in</strong>
-                <span>Role: <b id="live-user-role">staff</b></span>
+            <div className="live-data hidden" id="live-data">
+              <div className="live-toolbar">
+                <div>
+                  <strong id="live-user-email">Signed in</strong>
+                  <span>Role: <b id="live-user-role">staff</b></span>
+                </div>
+                <button id="live-sign-out" type="button">Sign out</button>
               </div>
-              <button id="live-sign-out" type="button">Sign out</button>
-            </div>
-            <div className="stats__grid live-stats">
-              <div className="stat-card"><span>Customers</span><strong id="live-count-customers">0</strong></div>
+              <div className="octa-local-shell" id="octa-local-shell">
+                <aside className="octa-side">
+                  <div className="octa-brand">
+                    <div className="octa-logo">O</div>
+                    <div><b>OCTA</b><span>Document OS</span></div>
+                  </div>
+                  <nav className="octa-nav" id="octa-nav">
+                    <button type="button" data-view="home">Home / Overview</button>
+                    <button type="button" data-view="customers">Customers</button>
+                    <button type="button" data-view="projects">Projects</button>
+                    <button type="button" data-view="project_costs">Project Costs</button>
+                    <button type="button" data-view="office_expenses">Office Expenses</button>
+                    <button type="button" data-view="quotations">Quotations</button>
+                    <button type="button" data-view="documents">Documents</button>
+                    <button type="button" data-view="invoices">Invoices</button>
+                    <button type="button" data-view="receipts">Receipts</button>
+                    <button type="button" data-view="billing">Billing & Collection</button>
+                    <button type="button" data-view="settings">System Setup</button>
+                  </nav>
+                </aside>
+                <main className="octa-main">
+                  <div className="octa-top">
+                    <div>
+                      <h2 id="octa-title">Home / Overview</h2>
+                      <p id="octa-subtitle">ภาพรวมงานค้างตามขั้นตอนขายและเอกสาร</p>
+                    </div>
+                    <div className="octa-actions">
+                      <button className="btn home" type="button" data-view-action="home">Home</button>
+                      <button className="btn" type="button" id="octa-new-record">+ New</button>
+                    </div>
+                  </div>
+                  <div id="octa-view"></div>
+                </main>
+              </div>
+              <div className="stats__grid live-stats">
+                <div className="stat-card"><span>Customers</span><strong id="live-count-customers">0</strong></div>
               <div className="stat-card"><span>Projects</span><strong id="live-count-projects">0</strong></div>
               <div className="stat-card"><span>Quotations</span><strong id="live-count-quotations">0</strong></div>
               <div className="stat-card"><span>Documents</span><strong id="live-count-documents">0</strong></div>
