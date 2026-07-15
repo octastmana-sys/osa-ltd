@@ -206,6 +206,56 @@ export default function Home() {
               <div className="panel"><h3>Latest quotations</h3><div id="live-quotations-table" /></div>
               <div className="panel"><h3>Latest invoices</h3><div id="live-invoices-table" /></div>
             </div>
+            <div className="workbench">
+              <div className="section__heading mini">
+                <p className="eyebrow">Operations Workbench</p>
+                <h2>Create, edit, and delete Firestore records.</h2>
+                <p>
+                  This is the first production management surface. Use quick forms
+                  for common work and the JSON editor for all migrated collections.
+                </p>
+              </div>
+              <div className="quick-panel">
+                <h3>Quick add customer</h3>
+                <form id="quick-customer-form" className="quick-form">
+                  <input name="name" placeholder="Customer name *" />
+                  <input name="contact_name" placeholder="Contact name" />
+                  <input name="phone" placeholder="Phone" />
+                  <input name="email" placeholder="Email" />
+                  <input name="tax_id" placeholder="Tax ID" />
+                  <input name="credit_term" placeholder="Credit term" />
+                  <textarea name="address" placeholder="Address"></textarea>
+                  <button type="submit">Create customer</button>
+                </form>
+              </div>
+              <div className="editor-grid">
+                <aside className="record-list-panel">
+                  <label>
+                    Collection
+                    <select id="workbench-collection"></select>
+                  </label>
+                  <div className="workbench-count" id="workbench-count">0 records</div>
+                  <div className="record-list" id="workbench-records" />
+                </aside>
+                <div className="json-editor-panel">
+                  <label>
+                    Document ID
+                    <input id="workbench-doc-id" placeholder="Blank = auto ID for new record" />
+                  </label>
+                  <label>
+                    JSON data
+                    <textarea id="workbench-json" spellCheck={false} defaultValue={"{}"}></textarea>
+                  </label>
+                  <div className="workbench-actions">
+                    <button id="workbench-new" type="button">New</button>
+                    <button id="workbench-save" type="button">Save</button>
+                    <button id="workbench-refresh" type="button">Refresh</button>
+                    <button id="workbench-delete" className="danger" type="button">Delete</button>
+                  </div>
+                  <div className="live-status compact" id="workbench-status">Ready.</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
