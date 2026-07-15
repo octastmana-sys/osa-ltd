@@ -47,7 +47,7 @@ let octaSearch = "";
 let auxCollectionsLoaded = false;
 
 const $ = (id) => document.getElementById(id);
-const liveRoot = $("live-console");
+const liveRoot = $("live-login-form");
 
 function setText(id, value) {
   const el = $(id);
