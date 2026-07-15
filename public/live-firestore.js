@@ -1002,18 +1002,103 @@ async function createGenericRecord(event) {
   }
 }
 
-function generateDocumentNo(documentType, documentDate) {
-  const prefixMap = {
-    DeliveryNote: "S",
-    SalesTaxInvoice: "TV",
-    TaxInvoiceReceipt: "TR",
-    Receipt: "RC",
-    PurchaseOrder: "PO",
+const PREFIX_BY_TYPE = {
+  ProjectCode: "PJ",
+  Quotation: "QT",
+  Invoice: "IV",
+  SalesTaxInvoice: "TV",
+  TaxInvoiceReceipt: "TR",
+  Receipt: "RC",
+  PurchaseOrder: "PO",
+  DeliveryNote: "S",
+};
+
+const DEFAULT_DOCUMENT_FORMAT = "{prefix}-{YYYYMM}-{running:03d}";
+
+function periodFromDate(value) {
+  const raw = value || new Date().toISOString().slice(0, 10);
+  return raw.slice(0, 7).replace("-", "");
+}
+
+function documentTokens(docDate, prefix, running, projectType = "") {
+  const raw = docDate || new Date().toISOString().slice(0, 10);
+  const yyyy = raw.slice(0, 4);
+  const yy = yyyy.slice(2);
+  const mm = raw.slice(5, 7);
+  return {
+    prefix,
+    YYYY: yyyy,
+    YY: yy,
+    MM: mm,
+    M: String(Number(mm)),
+    YYYYMM: `${yyyy}${mm}`,
+    YYMM: `${yy}${mm}`,
+    running,
+    project_type: (projectType || "MIX").toUpperCase(),
   };
-  const prefix = prefixMap[documentType] || "DOC";
-  const compactDate = String(documentDate || new Date().toISOString().slice(0, 10)).replaceAll("-", "");
-  const running = String((liveState.documents || []).length + 1).padStart(3, "0");
-  return `${prefix}-${compactDate}-${running}`;
+}
+
+function formatDocumentNo(pattern, prefix, docDate, running, projectType = "") {
+  const tokens = documentTokens(docDate, prefix, running, projectType);
+  return String(pattern || DEFAULT_DOCUMENT_FORMAT).replace(/\{([A-Za-z_]+)(?::0?(\d+)d)?\}/g, (_match, key, width) => {
+    const value = tokens[key];
+    if (value === undefined) return "";
+    if (key === "running" && width) return String(value).padStart(Number(width), "0");
+    return String(value);
+  });
+}
+
+function settingForDocumentType(documentType) {
+  return (
+    (liveState.document_settings || []).find((row) => row.document_type === documentType || row.id === documentType) || {
+      document_type: documentType,
+      prefix: PREFIX_BY_TYPE[documentType] || documentType.slice(0, 2).toUpperCase(),
+      number_format: DEFAULT_DOCUMENT_FORMAT,
+    }
+  );
+}
+
+function documentNoExists(documentType, documentNo) {
+  if ((liveState.document_numbers || []).some((row) => row.document_no === documentNo)) return true;
+  if (documentType === "Quotation" && (liveState.quotations || []).some((row) => row.quotation_no === documentNo)) return true;
+  if (documentType === "Invoice" && (liveState.invoices || []).some((row) => row.invoice_no === documentNo)) return true;
+  if (documentType === "Receipt" && (liveState.receipts || []).some((row) => row.receipt_no === documentNo)) return true;
+  return (liveState.documents || []).some((row) => row.document_type === documentType && row.document_no === documentNo);
+}
+
+async function reserveNextDocumentNo(documentType, documentDate, projectId = "") {
+  if (!auxCollectionsLoaded) {
+    await loadAuxCollections();
+  }
+  const project = lookupProject(projectId);
+  const setting = settingForDocumentType(documentType);
+  const prefix = String(setting.prefix || PREFIX_BY_TYPE[documentType] || documentType.slice(0, 2).toUpperCase()).trim();
+  const numberFormat = String(setting.number_format || DEFAULT_DOCUMENT_FORMAT).trim();
+  const period = periodFromDate(documentDate);
+  const rows = (liveState.document_numbers || []).filter(
+    (row) => row.document_type === documentType && row.prefix === prefix && row.period === period,
+  );
+  let running = Math.max(0, ...rows.map((row) => Number(row.running_no || 0))) + 1;
+  let documentNo = formatDocumentNo(numberFormat, prefix, documentDate, running, project?.project_type);
+  while (documentNoExists(documentType, documentNo)) {
+    running += 1;
+    documentNo = formatDocumentNo(numberFormat, prefix, documentDate, running, project?.project_type);
+  }
+  const numberPayload = cleanForFirestore({
+    prefix,
+    period,
+    running_no: running,
+    document_no: documentNo,
+    document_type: documentType,
+    project_id: projectId || "",
+    status: "issued",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    source: "web_app",
+  });
+  const numberRef = await firebaseApi.addDoc(firebaseApi.collection(firestoreDb, "document_numbers"), numberPayload);
+  liveState.document_numbers = [...(liveState.document_numbers || []), { id: numberRef.id, ...numberPayload }];
+  return documentNo;
 }
 
 function populateDocumentCreateForm() {
@@ -1055,11 +1140,12 @@ async function createDocumentRecord(event) {
     return;
   }
   const invoice = lookupInvoice(data.invoice_id);
+  const documentNo = data.document_no?.trim() || (await reserveNextDocumentNo(documentType, documentDate, data.project_id));
   const payload = cleanForFirestore({
     project_id: data.project_id,
     invoice_id: data.invoice_id || "",
     document_type: documentType,
-    document_no: data.document_no?.trim() || generateDocumentNo(documentType, documentDate),
+    document_no: documentNo,
     status: data.status || "draft",
     note: data.note?.trim() || "",
     created_at: `${documentDate}T00:00:00.000Z`,

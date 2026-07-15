@@ -35,6 +35,12 @@ service cloud.firestore {
       allow write: if hasRole("admin");
     }
 
+    match /document_numbers/{docId} {
+      allow read: if staff();
+      allow create: if staff();
+      allow update, delete: if hasRole("admin");
+    }
+
     match /reference_options/{docId} {
       allow read: if staff();
       allow write: if hasRole("admin");
