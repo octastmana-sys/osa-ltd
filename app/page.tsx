@@ -160,6 +160,24 @@ export default function Home() {
             <div className="live-status compact" id="document-create-status-message">Ready.</div>
           </form>
         </div>
+
+        <div className="editor-modal hidden" id="record-create-modal" aria-hidden="true">
+          <form className="editor-card document-create-card" id="record-create-form">
+            <div className="editor-head">
+              <div>
+                <p className="eyebrow" id="record-create-eyebrow">Create Record</p>
+                <h2 id="record-create-title">สร้างรายการใหม่</h2>
+              </div>
+              <button className="btn ghost" type="button" id="record-create-close">Close</button>
+            </div>
+            <div className="form-grid document-form-grid" id="record-create-fields"></div>
+            <div className="workbench-actions">
+              <button type="submit" id="record-create-submit">Create</button>
+              <button className="ghost" type="button" id="record-create-cancel">Cancel</button>
+            </div>
+            <div className="live-status compact" id="record-create-status-message">Ready.</div>
+          </form>
+        </div>
       </section>
 
       <script

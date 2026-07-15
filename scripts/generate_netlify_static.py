@@ -146,6 +146,21 @@ def main() -> None:
         <div class="live-status compact" id="document-create-status-message">Ready.</div>
       </form>
     </div>
+
+    <div class="editor-modal hidden" id="record-create-modal" aria-hidden="true">
+      <form class="editor-card document-create-card" id="record-create-form">
+        <div class="editor-head">
+          <div><p class="eyebrow" id="record-create-eyebrow">Create Record</p><h2 id="record-create-title">สร้างรายการใหม่</h2></div>
+          <button class="btn ghost" type="button" id="record-create-close">Close</button>
+        </div>
+        <div class="form-grid document-form-grid" id="record-create-fields"></div>
+        <div class="workbench-actions">
+          <button type="submit" id="record-create-submit">Create</button>
+          <button class="ghost" type="button" id="record-create-cancel">Cancel</button>
+        </div>
+        <div class="live-status compact" id="record-create-status-message">Ready.</div>
+      </form>
+    </div>
   </section>
 
   <script>

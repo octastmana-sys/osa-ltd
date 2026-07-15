@@ -45,6 +45,7 @@ let currentRole = null;
 let octaCurrentView = "home";
 let octaSearch = "";
 let auxCollectionsLoaded = false;
+let currentCreateView = "";
 
 const $ = (id) => document.getElementById(id);
 const liveRoot = $("live-login-form");
@@ -91,6 +92,20 @@ function setDocumentCreateVisible(isVisible) {
 
 function setDocumentCreateStatus(message, tone = "info") {
   const el = $("document-create-status-message");
+  if (!el) return;
+  el.textContent = message;
+  el.dataset.tone = tone;
+}
+
+function setRecordCreateVisible(isVisible) {
+  const modal = $("record-create-modal");
+  if (!modal) return;
+  modal.classList.toggle("hidden", !isVisible);
+  modal.setAttribute("aria-hidden", isVisible ? "false" : "true");
+}
+
+function setRecordCreateStatus(message, tone = "info") {
+  const el = $("record-create-status-message");
   if (!el) return;
   el.textContent = message;
   el.dataset.tone = tone;
@@ -853,6 +868,140 @@ function openWorkbenchForRecord(collectionName, docId) {
   $("workbench-json")?.focus();
 }
 
+function fieldLabel(key) {
+  const labels = {
+    customer_id: "Customer",
+    project_id: "Project",
+    invoice_id: "Invoice",
+    name: "Customer Name",
+    contact_name: "Contact Name",
+    project_code: "Project Code",
+    project_name: "Project Name",
+    project_type: "Project Type",
+    request_summary: "รายละเอียดงาน",
+    po_number: "PO Number",
+    po_date: "PO Date",
+    quotation_no: "Quotation No.",
+    quotation_date: "Quotation Date",
+    invoice_no: "Invoice No.",
+    invoice_date: "Invoice Date",
+    receipt_no: "Receipt No.",
+    receipt_date: "Receipt Date",
+    cost_date: "Cost Date",
+    expense_date: "Expense Date",
+    expense_month: "Expense Month",
+    paid_amount: "Paid Amount",
+    payment_method: "Payment Method",
+    payment_status: "Payment Status",
+    vat_amount: "VAT Amount",
+    credit_term: "Credit Term",
+    tax_id: "Tax ID",
+  };
+  return labels[key] || key.replaceAll("_", " ").replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function inputTypeForField(key, value) {
+  if (key.endsWith("_date")) return "date";
+  if (key === "expense_month") return "month";
+  if (typeof value === "number" || ["amount", "subtotal", "vat_amount", "total", "paid_amount"].includes(key)) return "number";
+  if (key === "email") return "email";
+  if (key === "phone") return "tel";
+  return "text";
+}
+
+function optionsForField(key) {
+  if (key === "customer_id") {
+    return (liveState.customers || []).map((customer) => [customer.id, customer.name || customer.id]);
+  }
+  if (key === "project_id") {
+    return (liveState.projects || []).map((project) => [project.id, projectOptionLabel(project) || project.id]);
+  }
+  if (key === "invoice_id") {
+    return (liveState.invoices || []).map((invoice) => [invoice.id, invoiceOptionLabel(invoice) || invoice.id]);
+  }
+  if (key === "project_type") return [["ELEC", "ELEC"], ["SIGN", "SIGN"], ["ICT", "ICT"], ["TRN", "TRN"], ["S", "S"], ["P", "P"], ["MIX", "MIX"]];
+  if (key === "status") return [["new", "new"], ["draft", "draft"], ["issued", "issued"], ["sent", "sent"], ["approved", "approved"], ["in_progress", "in_progress"], ["billing", "billing"], ["paid", "paid"], ["closed", "closed"], ["cancelled", "cancelled"]];
+  if (key === "category") return [["สินค้า", "สินค้า"], ["ค่าแรง", "ค่าแรง"], ["ผู้รับเหมา", "ผู้รับเหมา"], ["ขนส่ง", "ขนส่ง"], ["เดินทาง", "เดินทาง"], ["อุปกรณ์", "อุปกรณ์"], ["อื่นๆ", "อื่นๆ"]];
+  if (key === "payment_status") return [["unpaid", "unpaid"], ["paid", "paid"], ["partial", "partial"]];
+  if (key === "payment_method") return [["โอน", "โอน"], ["เงินสด", "เงินสด"], ["บัตรเครดิต", "บัตรเครดิต"], ["เช็ค", "เช็ค"], ["อื่นๆ", "อื่นๆ"]];
+  return null;
+}
+
+function renderCreateField(key, value) {
+  const label = fieldLabel(key);
+  const options = optionsForField(key);
+  const full = ["address", "request_summary", "payment_terms", "delivery_terms"].includes(key) ? " full" : "";
+  if (options) {
+    return `<label class="${full.trim()}">${escapeHtml(label)}
+      <select name="${escapeHtml(key)}">
+        <option value="">-- เลือก --</option>
+        ${options.map(([optionValue, optionLabel]) => `<option value="${escapeHtml(optionValue)}" ${String(value) === String(optionValue) ? "selected" : ""}>${escapeHtml(optionLabel)}</option>`).join("")}
+      </select>
+    </label>`;
+  }
+  if (["address", "request_summary", "payment_terms", "delivery_terms"].includes(key)) {
+    return `<label class="full">${escapeHtml(label)}<textarea name="${escapeHtml(key)}">${escapeHtml(value || "")}</textarea></label>`;
+  }
+  return `<label class="${full.trim()}">${escapeHtml(label)}<input name="${escapeHtml(key)}" type="${inputTypeForField(key, value)}" value="${escapeHtml(value ?? "")}" ${inputTypeForField(key, value) === "number" ? 'step="0.01"' : ""}></label>`;
+}
+
+function openRecordCreateModal(viewName) {
+  const config = VIEW_CONFIG[viewName];
+  if (!config) return;
+  currentCreateView = viewName;
+  const title = $("record-create-title");
+  const eyebrow = $("record-create-eyebrow");
+  const fields = $("record-create-fields");
+  if (title) title.textContent = `สร้าง ${config.title}`;
+  if (eyebrow) eyebrow.textContent = `Create ${config.collection}`;
+  if (fields) fields.innerHTML = Object.entries(config.newTemplate || {}).map(([key, value]) => renderCreateField(key, value)).join("");
+  setRecordCreateStatus("Ready.");
+  setRecordCreateVisible(true);
+}
+
+function normalizeCreatePayload(formData, template) {
+  const payload = {};
+  for (const [key, defaultValue] of Object.entries(template || {})) {
+    let value = formData.get(key);
+    if (value === null) value = defaultValue;
+    if (typeof defaultValue === "number" || ["amount", "subtotal", "vat_amount", "total", "paid_amount"].includes(key)) {
+      payload[key] = Number(value || 0);
+    } else {
+      payload[key] = String(value ?? "").trim();
+    }
+  }
+  payload.created_at = new Date().toISOString();
+  payload.updated_at = new Date().toISOString();
+  payload.source = "web_app";
+  return cleanForFirestore(payload);
+}
+
+async function createGenericRecord(event) {
+  event.preventDefault();
+  const config = VIEW_CONFIG[currentCreateView];
+  if (!config) return;
+  const payload = normalizeCreatePayload(new FormData(event.currentTarget), config.newTemplate);
+  if (config.collection === "customers" && !payload.name) {
+    setRecordCreateStatus("Customer name is required.", "error");
+    return;
+  }
+  if (config.collection === "projects" && !payload.project_name) {
+    setRecordCreateStatus("Project name is required.", "error");
+    return;
+  }
+  setRecordCreateStatus("Creating…");
+  try {
+    await firebaseApi.addDoc(firebaseApi.collection(firestoreDb, config.collection), payload);
+    setRecordCreateStatus("Created.", "success");
+    setRecordCreateVisible(false);
+    await refreshLiveData(false);
+    octaCurrentView = currentCreateView;
+    renderOctaApp();
+  } catch (error) {
+    setRecordCreateStatus(error?.message || "Create failed.", "error");
+  }
+}
+
 function generateDocumentNo(documentType, documentDate) {
   const prefixMap = {
     DeliveryNote: "S",
@@ -963,12 +1112,20 @@ function setupOctaShell() {
       setDocumentCreateVisible(false);
       return;
     }
+    if (event.target.closest("#record-create-close") || event.target.closest("#record-create-cancel")) {
+      setRecordCreateVisible(false);
+      return;
+    }
     if (event.target.id === "editor-modal") {
       setEditorVisible(false);
       return;
     }
     if (event.target.id === "document-create-modal") {
       setDocumentCreateVisible(false);
+      return;
+    }
+    if (event.target.id === "record-create-modal") {
+      setRecordCreateVisible(false);
       return;
     }
     const homeButton = event.target.closest("[data-view-action='home']");
@@ -1013,10 +1170,10 @@ function setupOctaShell() {
       openDocumentCreateModal();
       return;
     }
-    const config = VIEW_CONFIG[octaCurrentView] || VIEW_CONFIG.projects;
-    openWorkbenchForNew(config.collection, config.newTemplate);
+    openRecordCreateModal(octaCurrentView);
   });
   $("document-create-form")?.addEventListener("submit", createDocumentRecord);
+  $("record-create-form")?.addEventListener("submit", createGenericRecord);
   $("document-create-invoice")?.addEventListener("change", (event) => {
     const invoice = lookupInvoice(event.target.value);
     if (invoice?.project_id && $("document-create-project")) {
