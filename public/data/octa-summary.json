@@ -1,0 +1,400 @@
+{
+  "generated_at": "2026-07-15T17:10:25",
+  "source": "read-only anonymized snapshot from local SQLite database",
+  "privacy_note": "No customer names, contacts, addresses, tax IDs, document numbers, or free-text project details are included.",
+  "company": {
+    "name_en": "OCTA SYSTEM ANALYTIC CO., LTD.",
+    "name_th": "บริษัท ออคต้า ซิสเต็ม อนาไลติกส์ จำกัด",
+    "branch": "สำนักงานใหญ่",
+    "primary_color": "#111111",
+    "accent_color": "#F2CF00",
+    "secondary_color": "#9F1D1D",
+    "vat_rate": "0.07"
+  },
+  "counts": {
+    "customers": 11,
+    "projects": 32,
+    "quotations": 32,
+    "quotation_items": 40,
+    "documents": 102,
+    "invoices": 16,
+    "receipts": 47,
+    "project_costs": 17,
+    "office_expenses": 4,
+    "workflow_events": 32,
+    "document_numbers": 116,
+    "reference_options": 14
+  },
+  "financials": {
+    "quotation_total": 1666405.481,
+    "invoice_total": 1175322.39,
+    "invoice_paid": 46844.6,
+    "receipt_total": 51124.6,
+    "project_cost_total": 46798.81,
+    "office_expense_total": 18252.05,
+    "invoice_outstanding": 1128477.7899999998
+  },
+  "project_status": [
+    {
+      "status": "closed",
+      "count": 32
+    }
+  ],
+  "quotation_status": [
+    {
+      "status": "approved",
+      "count": 30,
+      "total": 1635996.081
+    },
+    {
+      "status": "rejected",
+      "count": 2,
+      "total": 30409.4
+    }
+  ],
+  "invoice_status": [
+    {
+      "status": "legacy_imported",
+      "count": 12,
+      "total": 1124197.79,
+      "paid": 0.0
+    },
+    {
+      "status": "paid",
+      "count": 4,
+      "total": 51124.6,
+      "paid": 46844.6
+    }
+  ],
+  "document_types": [
+    {
+      "document_type": "Quotation",
+      "count": 32
+    },
+    {
+      "document_type": "SalesTaxInvoice",
+      "count": 16
+    },
+    {
+      "document_type": "Invoice",
+      "count": 16
+    },
+    {
+      "document_type": "TaxInvoiceReceipt",
+      "count": 14
+    },
+    {
+      "document_type": "Receipt",
+      "count": 12
+    },
+    {
+      "document_type": "DeliveryNote",
+      "count": 12
+    }
+  ],
+  "document_status_matrix": [
+    {
+      "document_type": "DeliveryNote",
+      "status": "draft",
+      "count": 1
+    },
+    {
+      "document_type": "DeliveryNote",
+      "status": "issued",
+      "count": 2
+    },
+    {
+      "document_type": "DeliveryNote",
+      "status": "legacy_imported",
+      "count": 9
+    },
+    {
+      "document_type": "Invoice",
+      "status": "issued",
+      "count": 4
+    },
+    {
+      "document_type": "Invoice",
+      "status": "legacy_imported",
+      "count": 12
+    },
+    {
+      "document_type": "Quotation",
+      "status": "draft",
+      "count": 3
+    },
+    {
+      "document_type": "Quotation",
+      "status": "legacy_imported",
+      "count": 29
+    },
+    {
+      "document_type": "Receipt",
+      "status": "legacy_imported",
+      "count": 12
+    },
+    {
+      "document_type": "SalesTaxInvoice",
+      "status": "issued",
+      "count": 4
+    },
+    {
+      "document_type": "SalesTaxInvoice",
+      "status": "legacy_imported",
+      "count": 12
+    },
+    {
+      "document_type": "TaxInvoiceReceipt",
+      "status": "legacy_imported",
+      "count": 14
+    }
+  ],
+  "monthly_quotations": [
+    {
+      "month": "2023-09",
+      "count": 1,
+      "total": 45742.5
+    },
+    {
+      "month": "2023-10",
+      "count": 1,
+      "total": 66340.0
+    },
+    {
+      "month": "2023-12",
+      "count": 3,
+      "total": 967601.0
+    },
+    {
+      "month": "2024-05",
+      "count": 2,
+      "total": 229301.0
+    },
+    {
+      "month": "2024-07",
+      "count": 1,
+      "total": 35310.0
+    },
+    {
+      "month": "2024-09",
+      "count": 1,
+      "total": 10618.68
+    },
+    {
+      "month": "2024-10",
+      "count": 4,
+      "total": 22651.9
+    },
+    {
+      "month": "2025-01",
+      "count": 1,
+      "total": 17613.098799999996
+    },
+    {
+      "month": "2025-03",
+      "count": 2,
+      "total": 55319.0
+    },
+    {
+      "month": "2025-05",
+      "count": 2,
+      "total": 8474.4
+    },
+    {
+      "month": "2025-07",
+      "count": 1,
+      "total": 7704.0
+    },
+    {
+      "month": "2025-08",
+      "count": 1,
+      "total": 3852.0
+    },
+    {
+      "month": "2025-10",
+      "count": 2,
+      "total": 30409.4
+    },
+    {
+      "month": "2025-11",
+      "count": 1,
+      "total": 75000.0022
+    },
+    {
+      "month": "2026-02",
+      "count": 2,
+      "total": 12165.900000000001
+    },
+    {
+      "month": "2026-03",
+      "count": 2,
+      "total": 24610.0
+    },
+    {
+      "month": "2026-05",
+      "count": 2,
+      "total": 14552.0
+    },
+    {
+      "month": "2026-06",
+      "count": 3,
+      "total": 39140.6
+    }
+  ],
+  "monthly_invoices": [
+    {
+      "month": "2023-10",
+      "count": 1,
+      "total": 66340.0,
+      "paid": 0.0
+    },
+    {
+      "month": "2024-01",
+      "count": 3,
+      "total": 967601.0,
+      "paid": 0.0
+    },
+    {
+      "month": "2024-08",
+      "count": 1,
+      "total": 1177.0,
+      "paid": 0.0
+    },
+    {
+      "month": "2024-10",
+      "count": 1,
+      "total": 642.0,
+      "paid": 0.0
+    },
+    {
+      "month": "2024-11",
+      "count": 1,
+      "total": 884.89,
+      "paid": 0.0
+    },
+    {
+      "month": "2025-01",
+      "count": 1,
+      "total": 734.75,
+      "paid": 0.0
+    },
+    {
+      "month": "2025-04",
+      "count": 1,
+      "total": 262.15,
+      "paid": 0.0
+    },
+    {
+      "month": "2025-08",
+      "count": 2,
+      "total": 11556.0,
+      "paid": 0.0
+    },
+    {
+      "month": "2025-12",
+      "count": 1,
+      "total": 75000.0,
+      "paid": 0.0
+    },
+    {
+      "month": "2026-05",
+      "count": 1,
+      "total": 4280.0,
+      "paid": 0.0
+    },
+    {
+      "month": "2026-06",
+      "count": 3,
+      "total": 46844.6,
+      "paid": 46844.6
+    }
+  ],
+  "workflow": [
+    {
+      "stage": "legacy_imported",
+      "status": "needs_review",
+      "count": 29
+    },
+    {
+      "stage": "quotation_draft",
+      "status": "in_progress",
+      "count": 3
+    }
+  ],
+  "document_settings": [
+    {
+      "document_type": "DeliveryNote",
+      "label": "Delivery Note",
+      "prefix": "S",
+      "number_format": "{prefix}{YYYY}{M}-{running}"
+    },
+    {
+      "document_type": "Invoice",
+      "label": "Invoice",
+      "prefix": "IV",
+      "number_format": "{prefix}{YYYY}-{running:}"
+    },
+    {
+      "document_type": "ProjectCode",
+      "label": "Project Code",
+      "prefix": "PJ",
+      "number_format": "{prefix}-{YYYYMM}-{running:03d}-{project_type}"
+    },
+    {
+      "document_type": "PurchaseOrder",
+      "label": "Purchase Order",
+      "prefix": "PO",
+      "number_format": "{prefix}{YYYY}-{running:}"
+    },
+    {
+      "document_type": "Quotation",
+      "label": "Quotation",
+      "prefix": "QT",
+      "number_format": "{prefix}-{YYYYMM}-{running:03d}"
+    },
+    {
+      "document_type": "Receipt",
+      "label": "Receipt",
+      "prefix": "RC",
+      "number_format": "{prefix}{YYYY}-{running:}"
+    },
+    {
+      "document_type": "SalesTaxInvoice",
+      "label": "Tax Invoice",
+      "prefix": "TV",
+      "number_format": "{prefix}{YYYY}-{running:}"
+    },
+    {
+      "document_type": "TaxInvoiceReceipt",
+      "label": "Tax Invoice Receipt",
+      "prefix": "TR",
+      "number_format": "{prefix}{YYYY}-{running:}"
+    }
+  ],
+  "migration_plan": [
+    {
+      "phase": "Phase 1",
+      "name": "Deployable read-only portal",
+      "status": "implemented in this site",
+      "risk": "no writes to legacy data"
+    },
+    {
+      "phase": "Phase 2",
+      "name": "Cloud database model",
+      "status": "planned",
+      "risk": "requires mapping SQLite tables to D1 or managed DB"
+    },
+    {
+      "phase": "Phase 3",
+      "name": "Authenticated operations",
+      "status": "planned",
+      "risk": "requires user roles, audit log, backups"
+    },
+    {
+      "phase": "Phase 4",
+      "name": "Document/PDF pipeline",
+      "status": "planned",
+      "risk": "requires hosted file storage and PDF rendering strategy"
+    }
+  ]
+}
